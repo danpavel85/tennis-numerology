@@ -85,8 +85,14 @@ def tenis():
         s1=compatibility(d1,n2)
         s2=compatibility(d2,n1)
 
-        prob1=round(s1/(s1+s2)*100)
-        prob2=round(s2/(s1+s2)*100)
+        total = s1 + s2
+
+        if total == 0:
+            prob1 = 50
+            prob2 = 50
+        else:
+            prob1 = round(s1/total*100)
+            prob2 = round(s2/total*100)
 
         prediction=p1 if prob1>prob2 else p2
 
@@ -172,21 +178,73 @@ def profil():
 
         maturity=reduce_number(destiny+expression)
 
-        year=datetime.datetime.now().year
-        personal_year=reduce_number(destiny+year)
+        birth_digits=[int(d) for d in re.sub(r'\D','',birth)]
 
-        forecast=[]
+        life_cycle1=reduce_number(birth_digits[1])
+        life_cycle2=reduce_number(birth_digits[2])
+        life_cycle3=reduce_number(birth_digits[0])
+
+        challenge1=abs(life_cycle1-life_cycle2)
+        challenge2=abs(life_cycle2-life_cycle3)
+        challenge3=abs(life_cycle1-life_cycle3)
+
+        current_year=datetime.datetime.now().year
+
+        personal_year=reduce_number(destiny+current_year)
+
+        personal_month=reduce_number(personal_year+datetime.datetime.now().month)
+
+        personal_day=reduce_number(personal_month+datetime.datetime.now().day)
+
+        forecast_years=[]
+
         for i in range(1,10):
-            forecast.append((year+i,reduce_number(personal_year+i)))
+
+            year=current_year+i
+
+            vib=reduce_number(personal_year+i)
+
+            forecast_years.append((year,vib))
+
+        forecast_months=[]
+
+        for m in range(1,13):
+
+            vib=reduce_number(personal_year+m)
+
+            forecast_months.append((m,vib))
+
+        karmic=[]
+
+        if destiny in [13,14,16,19]:
+
+            karmic.append(destiny)
 
         result={
-            "destiny":destiny,
-            "expression":expression,
-            "soul":soul,
-            "personality":personality,
-            "maturity":maturity,
-            "personal_year":personal_year,
-            "forecast":forecast
+
+        "destiny":destiny,
+        "expression":expression,
+        "soul":soul,
+        "personality":personality,
+        "maturity":maturity,
+
+        "life_cycle1":life_cycle1,
+        "life_cycle2":life_cycle2,
+        "life_cycle3":life_cycle3,
+
+        "challenge1":challenge1,
+        "challenge2":challenge2,
+        "challenge3":challenge3,
+
+        "personal_year":personal_year,
+        "personal_month":personal_month,
+        "personal_day":personal_day,
+
+        "forecast_years":forecast_years,
+        "forecast_months":forecast_months,
+
+        "karmic":karmic
+
         }
 
     return render_template("profil.html",result=result)
