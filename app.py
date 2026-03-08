@@ -4,7 +4,6 @@ import datetime
 
 app = Flask(__name__)
 
-
 letter_values = {
 'A':1,'J':1,'S':1,
 'B':2,'K':2,'T':2,
@@ -25,53 +24,38 @@ def reduce_number(n):
 
 
 def name_number(name):
-
     total=0
-
     for c in name.upper():
         if c in letter_values:
             total+=letter_values[c]
-
     return reduce_number(total)
 
 
 def destiny_number(date):
-
     digits=[int(d) for d in re.sub(r'\D','',date)]
-
     return reduce_number(sum(digits))
 
 
 def soul_number(name):
-
     vowels="AEIOU"
-
     total=0
-
     for c in name.upper():
         if c in vowels and c in letter_values:
             total+=letter_values[c]
-
     return reduce_number(total)
 
 
 def personality_number(name):
-
     vowels="AEIOU"
-
     total=0
-
     for c in name.upper():
         if c not in vowels and c in letter_values:
             total+=letter_values[c]
-
     return reduce_number(total)
 
 
 def compatibility(a,b):
-
     diff=abs(a-b)
-
     return max(0,100-diff*12)
 
 
@@ -82,13 +66,10 @@ def relationship_years(date):
     if date:
 
         start=int(date[:4])
-
         current=datetime.datetime.now().year
 
         for y in range(current,current+5):
-
             vib=reduce_number(start+y)
-
             years.append((y,vib))
 
     return years
@@ -97,15 +78,15 @@ def relationship_years(date):
 def interpretation(score):
 
     if score>85:
-        return "Compatibilitate extrem de puternica. Posibila relatie de suflete pereche."
+        return "Compatibilitate extrem de puternica."
 
     if score>70:
-        return "Compatibilitate foarte buna cu potential de relatie stabila."
+        return "Compatibilitate foarte buna."
 
     if score>50:
-        return "Compatibilitate moderata. Relatia necesita compromis."
+        return "Compatibilitate moderata."
 
-    return "Compatibilitate scazuta. Relatia poate avea provocari."
+    return "Compatibilitate scazuta."
 
 
 # ---------------- HOME ----------------
@@ -169,10 +150,20 @@ def relatie():
     if request.method=="POST":
 
         name1=request.form["name1"]
-        name2=request.form["name2"]
+        married1=request.form.get("married1","")
 
         birth1=request.form["birth1"]
+        time1=request.form.get("time1","")
+        place1=request.form.get("place1","")
+
+
+        name2=request.form["name2"]
+        married2=request.form.get("married2","")
+
         birth2=request.form["birth2"]
+        time2=request.form.get("time2","")
+        place2=request.form.get("place2","")
+
 
         relation_date=request.form.get("relation_date","")
 
@@ -244,7 +235,6 @@ def relatie():
         "pers2":pers2,
 
         "relation_number":relation_number,
-
         "couple_energy":couple_energy,
 
         "emotional":emotional,
