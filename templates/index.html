@@ -6,7 +6,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>Ema - Analiza Numerologica Tenis</title>
+<title>Ema - Analiza</title>
 
 <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
 
@@ -24,27 +24,42 @@
 
 <form method="post">
 
+<div class="alert alert-info">
+
+<b>Informatii jucatori si meci</b><br>
+
+Toate datele despre jucatori, turnee, ora meciurilor si suprafata pot fi gasite pe
+<a href="https://www.flashscore.ro/tenis/" target="_blank">
+Flashscore Tenis
+</a>
+
+</div>
+
+
 <div class="row">
 
 <div class="col-md-6">
 
 <h5>Jucator 1</h5>
 
+<label class="form-label">Nume jucator</label>
 <input class="form-control mb-2"
 name="player1"
-placeholder="Nume jucator"
+placeholder="ex: Novak Djokovic"
 value="{{ request.form.get('player1','') }}">
 
+<label class="form-label">Data nasterii jucator</label>
 <input type="date"
 class="form-control mb-3"
 name="birth1"
 value="{{ request.form.get('birth1','') }}">
 
+<label class="form-label">Cota pariuri jucator 1</label>
 <input type="number"
 step="0.01"
 class="form-control"
 name="odds1"
-placeholder="Cota ex: 1.85"
+placeholder="ex: 1.85"
 value="{{ request.form.get('odds1','') }}">
 
 </div>
@@ -54,35 +69,41 @@ value="{{ request.form.get('odds1','') }}">
 
 <h5>Jucator 2</h5>
 
+<label class="form-label">Nume jucator</label>
 <input class="form-control mb-2"
 name="player2"
+placeholder="ex: Carlos Alcaraz"
 value="{{ request.form.get('player2','') }}">
 
+<label class="form-label">Data nasterii jucator</label>
 <input type="date"
 class="form-control mb-3"
 name="birth2"
 value="{{ request.form.get('birth2','') }}">
 
+<label class="form-label">Cota pariuri jucator 2</label>
 <input type="number"
 step="0.01"
 class="form-control"
 name="odds2"
-placeholder="Cota ex: 2.10"
+placeholder="ex: 2.10"
 value="{{ request.form.get('odds2','') }}">
 
 </div>
 
 </div>
 
+
 <hr>
 
+
+<h5>Date meci</h5>
 
 <div class="row">
 
 <div class="col-md-4">
 
-<label>Data meci</label>
-
+<label class="form-label">Data meci</label>
 <input type="date"
 class="form-control"
 name="date"
@@ -93,8 +114,7 @@ value="{{ request.form.get('date','') }}">
 
 <div class="col-md-4">
 
-<label>Ora</label>
-
+<label class="form-label">Ora meci</label>
 <input type="time"
 class="form-control"
 name="time"
@@ -105,10 +125,10 @@ value="{{ request.form.get('time','') }}">
 
 <div class="col-md-4">
 
-<label>Turneu / locatie</label>
-
+<label class="form-label">Turneu / locatie</label>
 <input class="form-control"
 name="tournament"
+placeholder="ex: Roland Garros"
 value="{{ request.form.get('tournament','') }}">
 
 </div>
@@ -120,7 +140,7 @@ value="{{ request.form.get('tournament','') }}">
 
 <div class="col-md-6">
 
-<label>Suprafata</label>
+<label class="form-label">Suprafata de joc</label>
 
 <select class="form-select" name="surface">
 
@@ -137,7 +157,7 @@ value="{{ request.form.get('tournament','') }}">
 
 <div class="col-md-6">
 
-<label>Runda</label>
+<label class="form-label">Runda turneului</label>
 
 <select class="form-select" name="round">
 
