@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ro">
+
 <head>
 
 <meta charset="UTF-8">
@@ -29,23 +30,36 @@
 
 <h5>Jucator 1</h5>
 
-<input class="form-control mb-2" name="player1" placeholder="Nume jucator">
+<input class="form-control mb-2" name="player1"
+value="{{ result.player1 if result else '' }}" placeholder="Nume jucator">
 
-<input type="date" class="form-control mb-3" name="birth1">
+<input type="date" class="form-control mb-3" name="birth1"
+value="{{ request.form.birth1 }}">
 
-<input type="number" step="0.01" class="form-control" name="odds1" placeholder="Cota ex: 1.85">
+<input type="number" step="0.01" class="form-control"
+name="odds1"
+value="{{ request.form.odds1 }}"
+placeholder="Cota ex: 1.85">
 
 </div>
+
 
 <div class="col-md-6">
 
 <h5>Jucator 2</h5>
 
-<input class="form-control mb-2" name="player2">
+<input class="form-control mb-2" name="player2"
+value="{{ result.player2 if result else '' }}">
 
-<input type="date" class="form-control mb-3" name="birth2">
+<input type="date" class="form-control mb-3"
+name="birth2"
+value="{{ request.form.birth2 }}">
 
-<input type="number" step="0.01" class="form-control" name="odds2" placeholder="Cota ex: 2.10">
+<input type="number" step="0.01"
+class="form-control"
+name="odds2"
+value="{{ request.form.odds2 }}"
+placeholder="Cota ex: 2.10">
 
 </div>
 
@@ -53,24 +67,45 @@
 
 <hr>
 
+
 <div class="row">
 
 <div class="col-md-4">
+
 <label>Data meci</label>
-<input type="date" class="form-control" name="date">
+
+<input type="date"
+class="form-control"
+name="date"
+value="{{ request.form.date }}">
+
 </div>
 
+
 <div class="col-md-4">
+
 <label>Ora</label>
-<input type="time" class="form-control" name="time">
+
+<input type="time"
+class="form-control"
+name="time"
+value="{{ request.form.time }}">
+
 </div>
+
 
 <div class="col-md-4">
-<label>Turneu</label>
-<input class="form-control" name="tournament">
+
+<label>Turneu / locatie</label>
+
+<input class="form-control"
+name="tournament"
+value="{{ request.form.tournament }}">
+
 </div>
 
 </div>
+
 
 <div class="row mt-3">
 
@@ -79,42 +114,57 @@
 <label>Suprafata</label>
 
 <select class="form-select" name="surface">
-<option value="Hard">Hard</option>
-<option value="Clay">Clay</option>
-<option value="Grass">Grass</option>
+
+<option value="Hard" {% if request.form.surface == "Hard" %}selected{% endif %}>Hard</option>
+<option value="Clay" {% if request.form.surface == "Clay" %}selected{% endif %}>Clay</option>
+<option value="Grass" {% if request.form.surface == "Grass" %}selected{% endif %}>Grass</option>
+
 </select>
 
 </div>
+
 
 <div class="col-md-6">
 
 <label>Runda</label>
 
 <select class="form-select" name="round">
-<option value="Round of 128">Round of 128</option>
-<option value="Round of 64">Round of 64</option>
-<option value="Round of 32">Round of 32</option>
-<option value="Round of 16">Round of 16</option>
-<option value="Quarterfinal">Quarterfinal</option>
-<option value="Semifinal">Semifinal</option>
-<option value="Final">Final</option>
+
+<option value="Round of 128" {% if request.form.round == "Round of 128" %}selected{% endif %}>Round of 128</option>
+<option value="Round of 64" {% if request.form.round == "Round of 64" %}selected{% endif %}>Round of 64</option>
+<option value="Round of 32" {% if request.form.round == "Round of 32" %}selected{% endif %}>Round of 32</option>
+<option value="Round of 16" {% if request.form.round == "Round of 16" %}selected{% endif %}>Round of 16</option>
+<option value="Quarterfinal" {% if request.form.round == "Quarterfinal" %}selected{% endif %}>Quarterfinal</option>
+<option value="Semifinal" {% if request.form.round == "Semifinal" %}selected{% endif %}>Semifinal</option>
+<option value="Final" {% if request.form.round == "Final" %}selected{% endif %}>Final</option>
+
 </select>
 
 </div>
 
 </div>
 
+
 <div class="text-center mt-4">
 
-<button class="btn btn-primary btn-lg">Genereaza analiza</button>
+<button class="btn btn-primary btn-lg">
 
-<a href="/" class="btn btn-secondary btn-lg ms-2">Refresh</a>
+Genereaza analiza
+
+</button>
+
+<a href="/" class="btn btn-secondary btn-lg ms-2">
+
+Refresh
+
+</a>
 
 </div>
 
 </form>
 
 </div>
+
 
 
 {% if result %}
@@ -135,7 +185,7 @@
 
 <li class="list-group-item">Vibratia rundei: <b>{{result.round}}</b></li>
 
-<li class="list-group-item">Energia completa a meciului (numarul evenimentului): <b>{{result.event}}</b></li>
+<li class="list-group-item">Energia completa a meciului: <b>{{result.event}}</b></li>
 
 <li class="list-group-item">Compatibilitatea presiunii competitionale: <b>{{result.pressure}}</b></li>
 
@@ -205,6 +255,7 @@
 
 <p>{{result.player2}}: {{result.book_prob2}}%</p>
 
+
 <hr>
 
 <h4>Value Bet</h4>
@@ -227,4 +278,5 @@
 </div>
 
 </body>
+
 </html>
