@@ -121,11 +121,81 @@
 
 <div class="card mt-4 p-4">
 
+<h4>Energia meciului</h4>
+
+<ul class="list-group mb-4">
+
+<li class="list-group-item">Vibratia zilei: <b>{{result.day}}</b></li>
+
+<li class="list-group-item">Vibratia orei meciului: <b>{{result.hour}}</b></li>
+
+<li class="list-group-item">Vibratia turneului / locatiei: <b>{{result.location}}</b></li>
+
+<li class="list-group-item">Vibratia suprafetei de joc: <b>{{result.surface}}</b></li>
+
+<li class="list-group-item">Vibratia rundei: <b>{{result.round}}</b></li>
+
+<li class="list-group-item">Energia completa a meciului (numarul evenimentului): <b>{{result.event}}</b></li>
+
+<li class="list-group-item">Compatibilitatea presiunii competitionale: <b>{{result.pressure}}</b></li>
+
+</ul>
+
+
+<div class="row">
+
+<div class="col-md-6">
+
+<h4>{{result.player1}}</h4>
+
+<ul class="list-group mb-4">
+
+<li class="list-group-item">Numarul destinului: <b>{{result.p1.destiny}}</b></li>
+
+<li class="list-group-item">Numarul numelui: <b>{{result.p1.name}}</b></li>
+
+<li class="list-group-item">Energia personala a anului: <b>{{result.p1.year}}</b></li>
+
+<li class="list-group-item">Numarul personal al zilei: <b>{{result.p1.personal}}</b></li>
+
+<li class="list-group-item">Scor numerologic: <b>{{result.p1.score}}</b></li>
+
+</ul>
+
+</div>
+
+
+<div class="col-md-6">
+
+<h4>{{result.player2}}</h4>
+
+<ul class="list-group mb-4">
+
+<li class="list-group-item">Numarul destinului: <b>{{result.p2.destiny}}</b></li>
+
+<li class="list-group-item">Numarul numelui: <b>{{result.p2.name}}</b></li>
+
+<li class="list-group-item">Energia personala a anului: <b>{{result.p2.year}}</b></li>
+
+<li class="list-group-item">Numarul personal al zilei: <b>{{result.p2.personal}}</b></li>
+
+<li class="list-group-item">Scor numerologic: <b>{{result.p2.score}}</b></li>
+
+</ul>
+
+</div>
+
+</div>
+
+
 <h4>Probabilitate numerologica</h4>
 
 <p>{{result.player1}}: <b>{{result.prob1}}%</b></p>
 
 <p>{{result.player2}}: <b>{{result.prob2}}%</b></p>
+
+
+{% if result.book_prob1 %}
 
 <hr>
 
@@ -142,6 +212,9 @@
 <p>{{result.player1}}: {{result.value1}}%</p>
 
 <p>{{result.player2}}: {{result.value2}}%</p>
+
+{% endif %}
+
 
 <hr>
 
