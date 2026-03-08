@@ -1,9 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="ro">
 
 <head>
 
-<title>Relationship Compatibility</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Calculator Compatibilitate Numerologica</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -13,11 +16,28 @@
 
 <body style="background:#f4f6fb">
 
+<nav class="navbar navbar-dark bg-dark">
+
+<div class="container">
+
+<a class="navbar-brand" href="/">Numerology Apps</a>
+
+<div>
+
+<a href="/tenis" class="btn btn-outline-light">Tenis</a>
+<a href="/relatie" class="btn btn-outline-light">Relatii</a>
+
+</div>
+
+</div>
+
+</nav>
+
+
 <div class="container py-5">
 
-<h2 class="text-center mb-4">❤️ Compatibility Calculator</h2>
+<h2 class="text-center mb-4">❤️ Analiza Numerologica a Relatiei</h2>
 
-<a href="/" class="btn btn-secondary mb-3">Home</a>
 
 <div class="card p-4">
 
@@ -27,30 +47,64 @@
 
 <div class="col-md-6">
 
-<label>Nume persoana 1</label>
-<input class="form-control mb-3" name="name1">
+<h5>Persoana 1</h5>
+
+<label>Nume complet</label>
+<input class="form-control mb-2" name="name1">
+
+<label>Nume dupa casatorie (optional)</label>
+<input class="form-control mb-2" name="married1">
 
 <label>Data nasterii</label>
-<input type="date" class="form-control mb-3" name="birth1">
+<input type="date" class="form-control mb-2" name="birth1">
+
+<label>Ora nasterii (optional)</label>
+<input type="time" class="form-control mb-2" name="time1">
+
+<label>Locul nasterii (optional)</label>
+<input class="form-control mb-3" name="place1">
 
 </div>
+
 
 <div class="col-md-6">
 
-<label>Nume persoana 2</label>
-<input class="form-control mb-3" name="name2">
+<h5>Persoana 2</h5>
+
+<label>Nume complet</label>
+<input class="form-control mb-2" name="name2">
+
+<label>Nume dupa casatorie (optional)</label>
+<input class="form-control mb-2" name="married2">
 
 <label>Data nasterii</label>
-<input type="date" class="form-control mb-3" name="birth2">
+<input type="date" class="form-control mb-2" name="birth2">
+
+<label>Ora nasterii (optional)</label>
+<input type="time" class="form-control mb-2" name="time2">
+
+<label>Locul nasterii (optional)</label>
+<input class="form-control mb-3" name="place2">
 
 </div>
 
 </div>
+
+<hr>
 
 <label>Data inceperii relatiei</label>
+
 <input type="date" class="form-control mb-3" name="relation_date">
 
-<button class="btn btn-danger btn-lg">Calculeaza compatibilitatea</button>
+<div class="text-center">
+
+<button class="btn btn-danger btn-lg">
+
+Genereaza analiza relatie
+
+</button>
+
+</div>
 
 </form>
 
@@ -61,32 +115,122 @@
 
 <div class="card mt-4 p-4">
 
-<h3 class="text-center">Compatibilitate: {{result.score}}%</h3>
+<h3 class="text-center">
 
-<p class="text-center">{{result.interpretation}}</p>
+Scor compatibilitate: {{result.score}}%
 
-<canvas id="chart"></canvas>
+</h3>
+
+<p class="text-center">
+
+{{result.interpretation}}
+
+</p>
+
+
+<canvas id="compatChart"></canvas>
 
 <hr>
 
-<p>Probabilitate casatorie: {{result.marriage}}%</p>
-<p>Probabilitate divort: {{result.divorce}}%</p>
+<h4>Numere personale</h4>
+
+<p>Numarul destinului: {{result.destiny1}} / {{result.destiny2}}</p>
+
+<p>Numarul numelui: {{result.name1}} / {{result.name2}}</p>
+
+<p>Numarul sufletului: {{result.soul1}} / {{result.soul2}}</p>
+
+<p>Numarul personalitatii: {{result.pers1}} / {{result.pers2}}</p>
+
+
+<hr>
+
+<h4>Analiza relatie</h4>
 
 <p>Numarul relatiei: {{result.relation_number}}</p>
 
-<p>Analiza karmica: {{result.karmic}}</p>
+<p>Vibratia cuplului: {{result.couple_energy}}</p>
+
+
+<hr>
+
+<h4>Compatibilitate</h4>
+
+<ul>
+
+<li>Emotionala: {{result.emotional}}%</li>
+
+<li>Sexuala: {{result.sexual}}%</li>
+
+<li>Mentala: {{result.mental}}%</li>
+
+<li>Spirituala: {{result.spiritual}}%</li>
+
+<li>Comunicare: {{result.communication}}%</li>
+
+<li>Incredere: {{result.trust}}%</li>
+
+<li>Pasiune: {{result.passion}}%</li>
+
+<li>Stabilitate: {{result.stability}}%</li>
+
+<li>Prieteni: {{result.friendship}}%</li>
+
+<li>Valori comune: {{result.values}}%</li>
+
+<li>Stil de viata: {{result.lifestyle}}%</li>
+
+<li>Atractie: {{result.attraction}}%</li>
+
+</ul>
+
+
+<hr>
+
+<h4>Analiza karmica</h4>
+
+<p>{{result.karmic}}</p>
+
+
+<hr>
+
+<h4>Probabilitati</h4>
+
+<p>Probabilitate casatorie: {{result.marriage}}%</p>
+
+<p>Probabilitate divort: {{result.divorce}}%</p>
+
+
+<hr>
+
+<h4>Analiza ani ai relatiei</h4>
+
+<ul>
+
+{% for y,v in result.years %}
+
+<li>{{y}} - Vibratia relatiei: {{v}}</li>
+
+{% endfor %}
+
+</ul>
 
 </div>
 
 
 <script>
 
-new Chart(document.getElementById('chart'),{
+new Chart(document.getElementById('compatChart'),{
 
 type:'radar',
 
 data:{
-labels:['Emotional','Sexual','Mental','Spiritual','Communication','Trust','Passion','Stability','Friendship','Values','Lifestyle','Attraction'],
+
+labels:[
+'Emotional','Sexual','Mental','Spiritual',
+'Communication','Trust','Passion','Stability',
+'Friendship','Values','Lifestyle','Attraction'
+],
 
 datasets:[{
 
