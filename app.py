@@ -57,38 +57,93 @@ def home():
 def tenis():
     result = None
     if request.method == "POST":
+        # Preluare date jucători
         p1_name = request.form.get("player1", "")
         p2_name = request.form.get("player2", "")
         b1 = request.form.get("birth1", "")
         b2 = request.form.get("birth2", "")
+        
+        # Preluare date meci (pentru Energia Meciului)
         match_date = request.form.get("date", "")
+        match_time = request.form.get("time", "") # ex: "14:30"
+        location = request.form.get("tournament", "")
+        surface = request.form.get("surface", "")
+        round_name = request.form.get("round", "")
+
+        # 1. Calcule Vibratii Energie Meci
+        day_vib = destiny_number(match_date) if match_date else 0
         
-        # Calcule de baza
-        d1 = destiny_number(b1)
-        d2 = destiny_number(b2)
-        n1 = name_number(p1_name)
-        n2 = name_number(p2_name)
+        # Vibratia orei (adunăm cifrele orei și minutelor)
+        hour_digits = re.sub(r"\D", "", match_time)
+        hour_vib = reduce_number(sum(int(d) for d in hour_digits)) if hour_digits else 0
         
-        # Vibratia zilei (daca e selectata)
-        day_vib = destiny_number(match_date) if match_date else 5
+        loc_vib = name_number(location) if location else 0
+        surf_vib = name_number(surface) if surface else 0
+        round_vib = name_number(round_name) if round_name else 0
         
-        # Simulam restul valorilor cerute de HTML pentru a evita eroarea
-        s1_score = compatibility(d1, day_vib) + compatibility(n1, day_vib)
-        s2_score = compatibility(d2, day_vib) + compatibility(n2, day_vib)
+        # Energia completa (suma tuturor vibrațiilor meciului)
+        event_energy = reduce_number(day_vib + hour_vib + loc_vib + surf_vib + round_vib)
+
+        # 2. Calcule Jucători
+        d1, d2 = destiny_number(b1), destiny_number(b2)
+        n1, n2 = name_number(p1_name), name_number(p2_name)
         
+        # Energia personală a zilei (Destin + Vibrația zilei)
+        p1_personal_day = reduce_number(d1 + day_vib)
+        p2_personal_day = reduce_number(d2 + day_vib)
+        
+        # Scoruri bazate pe compatibilitatea cu energia evenimentului
+        s1_score = compatibility(p1_personal_day, event_energy)
+        s2_score = compatibility(p2_personal_day, event_energy)
+        
+        # 3. Probabilități
         total = s1_score + s2_score
         prob1 = round((s1_score / total) * 100) if total > 0 else 50
         prob2 = 100 - prob1
 
         result = {
-            "player1": p1_name, "player2": p2_name,
-            "day": day_vib, "hour": "N/A", "location": "N/A", "surface": "N/A", "round": "N/A", "event": "N/A", "pressure": "N/A",
-            "p1": {"destiny": d1, "name": n1, "year": reduce_number(d1 + 2024), "personal": reduce_number(d1 + day_vib), "score": s1_score},
-            "p2": {"destiny": d2, "name": n2, "year": reduce_number(d2 + 2024), "personal": reduce_number(d2 + day_vib), "score": s2_score},
-            "prob1": prob1, "prob2": prob2,
+            "player1": p1_name, 
+            "player2": p2_name,
+            "day": day_vib, 
+            "hour": hour_vib, 
+            "location": loc_vib, 
+            "surface": surf_vib, 
+            "round": round_vib, 
+            "event": event_energy, 
+            "pressure": compatibility(event_energy, 9), # Presiunea vs cifra de putere 9
+            "p1": {
+                "destiny": d1, 
+                "name": n1, 
+                "year": reduce_number(d1 + datetime.datetime.now().year), 
+                "personal": p1_personal_day, 
+                "score": s1_score
+            },
+            "p2": {
+                "destiny": d2, 
+                "name": n2, 
+                "year": reduce_number(d2 + datetime.datetime.now().year), 
+                "personal": p2_personal_day, 
+                "score": s2_score
+            },
+            "prob1": prob1, 
+            "prob2": prob2,
             "prediction": p1_name if prob1 > prob2 else p2_name
         }
+        
+        # Calcul probabilitate Bookmaker (dacă există cote)
+        o1 = request.form.get("odds1")
+        o2 = request.form.get("odds2")
+        if o1 and o2:
+            try:
+                b_p1 = (1/float(o1)) / ((1/float(o1)) + (1/float(o2))) * 100
+                result["book_prob1"] = round(b_p1, 1)
+                result["book_prob2"] = round(100 - b_p1, 1)
+                result["value1"] = round(prob1 - b_p1, 1)
+                result["value2"] = round(prob2 - (100 - b_p1), 1)
+            except: pass
+
     return render_template("index.html", result=result)
+
 
 @app.route("/relatie", methods=["GET","POST"])
 def relatie():
