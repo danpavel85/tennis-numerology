@@ -25,49 +25,72 @@ def reduce_number(n):
 
 
 def name_number(name):
-    total = 0
+
+    total=0
+
     for c in name.upper():
         if c in letter_values:
-            total += letter_values[c]
+            total+=letter_values[c]
+
     return reduce_number(total)
 
 
 def destiny_number(date):
-    digits = [int(d) for d in re.sub(r'\D','',date)]
+
+    digits=[int(d) for d in re.sub(r'\D','',date)]
+
     return reduce_number(sum(digits))
 
 
 def soul_number(name):
+
     vowels="AEIOU"
+
     total=0
+
     for c in name.upper():
         if c in vowels and c in letter_values:
             total+=letter_values[c]
+
     return reduce_number(total)
 
 
 def personality_number(name):
+
     vowels="AEIOU"
+
     total=0
+
     for c in name.upper():
         if c not in vowels and c in letter_values:
             total+=letter_values[c]
+
     return reduce_number(total)
 
 
 def compatibility(a,b):
-    diff = abs(a-b)
+
+    diff=abs(a-b)
+
     return max(0,100-diff*12)
 
 
 def relationship_years(date):
+
     years=[]
+
     if date:
+
         start=int(date[:4])
+
         current=datetime.datetime.now().year
+
         for y in range(current,current+5):
+
             vib=reduce_number(start+y)
+
             years.append((y,vib))
+
     return years
 
 
@@ -77,7 +100,7 @@ def interpretation(score):
         return "Compatibilitate extrem de puternica. Posibila relatie de suflete pereche."
 
     if score>70:
-        return "Compatibilitate foarte buna. Relatie stabila cu potential mare."
+        return "Compatibilitate foarte buna cu potential de relatie stabila."
 
     if score>50:
         return "Compatibilitate moderata. Relatia necesita compromis."
@@ -106,8 +129,6 @@ def tenis():
 
         b1=request.form["birth1"]
         b2=request.form["birth2"]
-
-        date=request.form["date"]
 
         destiny1=destiny_number(b1)
         destiny2=destiny_number(b2)
@@ -155,8 +176,12 @@ def relatie():
 
         relation_date=request.form.get("relation_date","")
 
+
         destiny1=destiny_number(birth1)
         destiny2=destiny_number(birth2)
+
+        name_num1=name_number(name1)
+        name_num2=name_number(name2)
 
         soul1=soul_number(name1)
         soul2=soul_number(name2)
@@ -164,10 +189,11 @@ def relatie():
         pers1=personality_number(name1)
         pers2=personality_number(name2)
 
-        name_num1=name_number(name1)
-        name_num2=name_number(name2)
 
         relation_number=reduce_number(destiny1+destiny2)
+
+        couple_energy=reduce_number(name_num1+name_num2)
+
 
         emotional=compatibility(soul1,soul2)
         sexual=compatibility(pers1,pers2)
@@ -178,27 +204,48 @@ def relatie():
         passion=compatibility(pers1,pers2)
         stability=compatibility(destiny1,name_num2)
         friendship=compatibility(soul1,name_num2)
-        values=compatibility(destiny1,destiny2)
+        values_score=compatibility(destiny1,destiny2)
         lifestyle=compatibility(pers1,name_num2)
         attraction=compatibility(pers1,soul2)
+
 
         compat_list=[
         emotional,sexual,mental,spiritual,
         communication,trust,passion,stability,
-        friendship,values,lifestyle,attraction
+        friendship,values_score,lifestyle,attraction
         ]
 
         score=round(sum(compat_list)/len(compat_list))
 
+
         marriage=min(100,score+10 if relation_number in [2,6] else score)
+
         divorce=max(0,100-score)
 
         karmic="Relatie karmica" if destiny1==destiny2 else "Relatie normala"
 
         years=relationship_years(relation_date)
 
+
         result={
+
         "score":score,
+
+        "destiny1":destiny1,
+        "destiny2":destiny2,
+
+        "name_num1":name_num1,
+        "name_num2":name_num2,
+
+        "soul1":soul1,
+        "soul2":soul2,
+
+        "pers1":pers1,
+        "pers2":pers2,
+
+        "relation_number":relation_number,
+
+        "couple_energy":couple_energy,
 
         "emotional":emotional,
         "sexual":sexual,
@@ -209,17 +256,18 @@ def relatie():
         "passion":passion,
         "stability":stability,
         "friendship":friendship,
-        "values":values,
+        "values_score":values_score,
         "lifestyle":lifestyle,
         "attraction":attraction,
 
         "marriage":marriage,
         "divorce":divorce,
 
-        "relation_number":relation_number,
         "karmic":karmic,
         "interpretation":interpretation(score),
+
         "years":years
+
         }
 
     return render_template("relatie.html",result=result)
