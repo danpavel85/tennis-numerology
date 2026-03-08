@@ -5,7 +5,7 @@ import os
 
 app = Flask(__name__)
 
-# ---------------- NUMEROLOGY CORE ----------------
+# ---------------- NUMEROLOGY ----------------
 
 letter_values = {
 'A':1,'J':1,'S':1,
@@ -20,77 +20,46 @@ letter_values = {
 }
 
 def reduce_number(n):
-
     while n > 9 and n not in [11,22,33]:
-
-        n=sum(int(d) for d in str(n))
-
+        n = sum(int(d) for d in str(n))
     return n
 
-
 def name_number(name):
-
-    total=0
-
+    total = 0
     for c in name.upper():
-
         if c in letter_values:
-
-            total+=letter_values[c]
-
+            total += letter_values[c]
     return reduce_number(total)
-
 
 def destiny_number(date):
-
-    digits=[int(d) for d in re.sub(r'\D','',date)]
-
+    digits = [int(d) for d in re.sub(r'\D','',date)]
     return reduce_number(sum(digits))
 
-
 def soul_number(name):
-
     vowels="AEIOU"
-
     total=0
-
     for c in name.upper():
-
         if c in vowels and c in letter_values:
-
             total+=letter_values[c]
-
     return reduce_number(total)
-
 
 def personality_number(name):
-
     vowels="AEIOU"
-
     total=0
-
     for c in name.upper():
-
         if c not in vowels and c in letter_values:
-
             total+=letter_values[c]
-
     return reduce_number(total)
 
-
 def compatibility(a,b):
-
     diff=abs(a-b)
-
     return max(0,100-diff*12)
 
 # ---------------- HOME ----------------
 
 @app.route("/")
 def home():
-
     return render_template("home.html")
-
 
 # ---------------- TENIS ----------------
 
@@ -101,40 +70,35 @@ def tenis():
 
     if request.method=="POST":
 
-        player1=request.form.get("player1")
-        player2=request.form.get("player2")
+        p1=request.form.get("player1")
+        p2=request.form.get("player2")
 
-        birth1=request.form.get("birth1")
-        birth2=request.form.get("birth2")
+        b1=request.form.get("birth1")
+        b2=request.form.get("birth2")
 
-        destiny1=destiny_number(birth1)
-        destiny2=destiny_number(birth2)
+        d1=destiny_number(b1)
+        d2=destiny_number(b2)
 
-        name1=name_number(player1)
-        name2=name_number(player2)
+        n1=name_number(p1)
+        n2=name_number(p2)
 
-        score1=compatibility(destiny1,name2)
-        score2=compatibility(destiny2,name1)
+        s1=compatibility(d1,n2)
+        s2=compatibility(d2,n1)
 
-        prob1=round(score1/(score1+score2)*100)
-        prob2=round(score2/(score1+score2)*100)
+        prob1=round(s1/(s1+s2)*100)
+        prob2=round(s2/(s1+s2)*100)
 
-        prediction=player1 if prob1>prob2 else player2
+        prediction=p1 if prob1>prob2 else p2
 
         result={
-
-        "player1":player1,
-        "player2":player2,
-
-        "prob1":prob1,
-        "prob2":prob2,
-
-        "prediction":prediction
-
+            "player1":p1,
+            "player2":p2,
+            "prob1":prob1,
+            "prob2":prob2,
+            "prediction":prediction
         }
 
     return render_template("index.html",result=result)
-
 
 # ---------------- RELATIE ----------------
 
@@ -151,11 +115,11 @@ def relatie():
         birth1=request.form.get("birth1")
         birth2=request.form.get("birth2")
 
-        destiny1=destiny_number(birth1)
-        destiny2=destiny_number(birth2)
+        d1=destiny_number(birth1)
+        d2=destiny_number(birth2)
 
-        name_num1=name_number(name1)
-        name_num2=name_number(name2)
+        n1=name_number(name1)
+        n2=name_number(name2)
 
         soul1=soul_number(name1)
         soul2=soul_number(name2)
@@ -163,42 +127,33 @@ def relatie():
         pers1=personality_number(name1)
         pers2=personality_number(name2)
 
-        relation_number=reduce_number(destiny1+destiny2)
-
-        couple_energy=reduce_number(name_num1+name_num2)
+        relation=reduce_number(d1+d2)
+        couple=reduce_number(n1+n2)
 
         emotional=compatibility(soul1,soul2)
         sexual=compatibility(pers1,pers2)
-        mental=compatibility(name_num1,name_num2)
-        spiritual=compatibility(destiny1,destiny2)
+        mental=compatibility(n1,n2)
+        spiritual=compatibility(d1,d2)
 
         score=round((emotional+sexual+mental+spiritual)/4)
 
         result={
-
-        "score":score,
-
-        "destiny1":destiny1,
-        "destiny2":destiny2,
-
-        "name_num1":name_num1,
-        "name_num2":name_num2,
-
-        "soul1":soul1,
-        "soul2":soul2,
-
-        "pers1":pers1,
-        "pers2":pers2,
-
-        "relation_number":relation_number,
-        "couple_energy":couple_energy
-
+            "score":score,
+            "destiny1":d1,
+            "destiny2":d2,
+            "name_num1":n1,
+            "name_num2":n2,
+            "soul1":soul1,
+            "soul2":soul2,
+            "pers1":pers1,
+            "pers2":pers2,
+            "relation_number":relation,
+            "couple_energy":couple
         }
 
     return render_template("relatie.html",result=result)
 
-
-# ---------------- PROFIL NUMEROLOGIC ----------------
+# ---------------- PROFIL ----------------
 
 @app.route("/profil", methods=["GET","POST"])
 def profil():
@@ -218,38 +173,26 @@ def profil():
         maturity=reduce_number(destiny+expression)
 
         year=datetime.datetime.now().year
-
         personal_year=reduce_number(destiny+year)
 
         forecast=[]
-
         for i in range(1,10):
-
             forecast.append((year+i,reduce_number(personal_year+i)))
 
         result={
-
-        "name":name,
-
-        "destiny":destiny,
-        "expression":expression,
-        "soul":soul,
-        "personality":personality,
-        "maturity":maturity,
-
-        "personal_year":personal_year,
-
-        "forecast":forecast
-
+            "destiny":destiny,
+            "expression":expression,
+            "soul":soul,
+            "personality":personality,
+            "maturity":maturity,
+            "personal_year":personal_year,
+            "forecast":forecast
         }
 
     return render_template("profil.html",result=result)
 
-
-# ---------------- SERVER ----------------
+# ---------------- RUN SERVER ----------------
 
 if __name__=="__main__":
-
     port=int(os.environ.get("PORT",10000))
-
     app.run(host="0.0.0.0",port=port)
