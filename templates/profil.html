@@ -8,12 +8,9 @@
 
 <title>Profil Numerologic</title>
 
-<link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
-
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
 </head>
-
 
 <body style="background:#f4f6fb;">
 
@@ -21,13 +18,11 @@
 
 <div class="text-center mb-4">
 
-<a href="/" class="btn btn-secondary">
-Home
-</a>
+<a href="/" class="btn btn-secondary">Home</a>
 
 </div>
 
-<h2 class="text-center mb-4">🔢 Profil Numerologic</h2>
+<h2 class="text-center mb-4">Profil Numerologic Avansat</h2>
 
 <div class="card p-4">
 
@@ -41,15 +36,13 @@ Home
 
 <input class="form-control mb-3"
 name="name"
-placeholder="ex: Ion Popescu"
 value="{{ request.form.get('name','') }}">
 
 </div>
 
-
 <div class="col-md-6">
 
-<label class="form-label">Data nașterii</label>
+<label class="form-label">Data nasterii</label>
 
 <input type="date"
 class="form-control mb-3"
@@ -60,12 +53,11 @@ value="{{ request.form.get('birth','') }}">
 
 </div>
 
-
 <div class="text-center">
 
 <button class="btn btn-success btn-lg">
 
-Genereaza profil numerologic
+Genereaza analiza
 
 </button>
 
@@ -81,7 +73,6 @@ Refresh
 
 </div>
 
-
 {% if result %}
 
 <div class="card mt-4 p-4">
@@ -90,49 +81,69 @@ Refresh
 
 <ul class="list-group mb-4">
 
-<li class="list-group-item">
-Numarul destinului: <b>{{result.destiny}}</b>
-</li>
-
-<li class="list-group-item">
-Numarul expresiei: <b>{{result.expression}}</b>
-</li>
-
-<li class="list-group-item">
-Numarul sufletului: <b>{{result.soul}}</b>
-</li>
-
-<li class="list-group-item">
-Numarul personalitatii: <b>{{result.personality}}</b>
-</li>
-
-<li class="list-group-item">
-Numarul maturitatii: <b>{{result.maturity}}</b>
-</li>
+<li class="list-group-item">Destin: {{result.destiny}}</li>
+<li class="list-group-item">Expresie: {{result.expression}}</li>
+<li class="list-group-item">Suflet: {{result.soul}}</li>
+<li class="list-group-item">Personalitate: {{result.personality}}</li>
+<li class="list-group-item">Maturitate: {{result.maturity}}</li>
 
 </ul>
 
-
-<h4>Anul personal</h4>
+<h4>Cicluri de viata</h4>
 
 <ul class="list-group mb-4">
 
-<li class="list-group-item">
-An personal curent: <b>{{result.personal_year}}</b>
-</li>
+<li class="list-group-item">Ciclu 1: {{result.life_cycle1}}</li>
+<li class="list-group-item">Ciclu 2: {{result.life_cycle2}}</li>
+<li class="list-group-item">Ciclu 3: {{result.life_cycle3}}</li>
 
 </ul>
 
+<h4>Provocari numerologice</h4>
 
-<h4>Prognoza numerologica (9 ani)</h4>
+<ul class="list-group mb-4">
 
-<ul class="list-group">
+<li class="list-group-item">Provocare 1: {{result.challenge1}}</li>
+<li class="list-group-item">Provocare 2: {{result.challenge2}}</li>
+<li class="list-group-item">Provocare 3: {{result.challenge3}}</li>
 
-{% for year,vib in result.forecast %}
+</ul>
+
+<h4>Energie personala</h4>
+
+<ul class="list-group mb-4">
+
+<li class="list-group-item">An personal: {{result.personal_year}}</li>
+<li class="list-group-item">Luna personala: {{result.personal_month}}</li>
+<li class="list-group-item">Zi personala: {{result.personal_day}}</li>
+
+</ul>
+
+<h4>Prognoza pe 9 ani</h4>
+
+<ul class="list-group mb-4">
+
+{% for year,v in result.forecast_years %}
 
 <li class="list-group-item">
 
-{{year}} → vibratia anului: <b>{{vib}}</b>
+{{year}} → vibratie {{v}}
+
+</li>
+
+{% endfor %}
+
+</ul>
+
+<h4>Prognoza pe 12 luni</h4>
+
+<ul class="list-group mb-4">
+
+{% for m,v in result.forecast_months %}
+
+<li class="list-group-item">
+
+Luna {{m}} → vibratie {{v}}
 
 </li>
 
@@ -147,5 +158,4 @@ An personal curent: <b>{{result.personal_year}}</b>
 </div>
 
 </body>
-
 </html>
