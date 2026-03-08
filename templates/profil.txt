@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Profil Numerologic</title>
+
+<link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+
+<body style="background:#f4f6fb;">
+
+<div class="container py-5">
+
+<div class="text-center mb-4">
+
+<a href="/" class="btn btn-secondary">
+Home
+</a>
+
+</div>
+
+<h2 class="text-center mb-4">🔢 Profil Numerologic</h2>
+
+<div class="card p-4">
+
+<form method="post">
+
+<div class="row">
+
+<div class="col-md-6">
+
+<label class="form-label">Nume complet</label>
+
+<input class="form-control mb-3"
+name="name"
+placeholder="ex: Ion Popescu"
+value="{{ request.form.get('name','') }}">
+
+</div>
+
+
+<div class="col-md-6">
+
+<label class="form-label">Data nașterii</label>
+
+<input type="date"
+class="form-control mb-3"
+name="birth"
+value="{{ request.form.get('birth','') }}">
+
+</div>
+
+</div>
+
+
+<div class="text-center">
+
+<button class="btn btn-success btn-lg">
+
+Genereaza profil numerologic
+
+</button>
+
+<a href="/profil" class="btn btn-secondary btn-lg ms-2">
+
+Refresh
+
+</a>
+
+</div>
+
+</form>
+
+</div>
+
+
+{% if result %}
+
+<div class="card mt-4 p-4">
+
+<h4>Numere personale</h4>
+
+<ul class="list-group mb-4">
+
+<li class="list-group-item">
+Numarul destinului: <b>{{result.destiny}}</b>
+</li>
+
+<li class="list-group-item">
+Numarul expresiei: <b>{{result.expression}}</b>
+</li>
+
+<li class="list-group-item">
+Numarul sufletului: <b>{{result.soul}}</b>
+</li>
+
+<li class="list-group-item">
+Numarul personalitatii: <b>{{result.personality}}</b>
+</li>
+
+<li class="list-group-item">
+Numarul maturitatii: <b>{{result.maturity}}</b>
+</li>
+
+</ul>
+
+
+<h4>Anul personal</h4>
+
+<ul class="list-group mb-4">
+
+<li class="list-group-item">
+An personal curent: <b>{{result.personal_year}}</b>
+</li>
+
+</ul>
+
+
+<h4>Prognoza numerologica (9 ani)</h4>
+
+<ul class="list-group">
+
+{% for year,vib in result.forecast %}
+
+<li class="list-group-item">
+
+{{year}} → vibratia anului: <b>{{vib}}</b>
+
+</li>
+
+{% endfor %}
+
+</ul>
+
+</div>
+
+{% endif %}
+
+</div>
+
+</body>
+
+</html>
