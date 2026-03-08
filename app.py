@@ -1,8 +1,8 @@
 from flask import Flask, render_template, request
 import re
+import datetime
 
 app = Flask(__name__)
-
 
 letter_values = {
 'A':1,'J':1,'S':1,
@@ -17,25 +17,15 @@ letter_values = {
 }
 
 
-compatibility = {
-1:[1,3,5,6,8],
-2:[2,4,6,8],
-3:[1,3,6,9],
-4:[2,4,8],
-5:[1,5,7],
-6:[1,2,3,6,9],
-7:[5,7],
-8:[1,2,4,8],
-9:[3,6,9]
-}
-
-
 def reduce_number(n):
-
     while n > 9 and n not in [11,22,33]:
         n = sum(int(d) for d in str(n))
-
     return n
+
+
+def destiny_number(date):
+    digits = [int(d) for d in re.sub(r'\D','',date)]
+    return reduce_number(sum(digits))
 
 
 def name_number(name):
@@ -43,338 +33,191 @@ def name_number(name):
     total = 0
 
     for c in name.upper():
-
         if c in letter_values:
             total += letter_values[c]
 
     return reduce_number(total)
 
-
-def destiny_number(date):
-
-    digits = [int(d) for d in re.sub(r'\D','',date)]
-
-    return reduce_number(sum(digits))
-
-
-def universal_day(date):
-
-    digits = [int(d) for d in re.sub(r'\D','',date)]
-
-    return reduce_number(sum(digits))
-
-
-def personal_day(birth, match):
-
-    b = sum(int(d) for d in re.sub(r'\D','',birth))
-
-    m = sum(int(d) for d in re.sub(r'\D','',match))
-
-    return reduce_number(b + m)
-
-
-def personal_year(birth, match):
-
-    birth_digits = [int(d) for d in re.sub(r'\D','',birth)][4:]
-
-    year_digits = [int(d) for d in match[:4]]
-
-    return reduce_number(sum(birth_digits) + sum(year_digits))
-
-
-def hour_vibration(time):
-
-    digits = [int(d) for d in re.sub(r'\D','',time)]
-
-    return reduce_number(sum(digits))
-
-
-def word_vibration(word):
-
-    total = 0
-
-    for c in word.upper():
-
-        if c in letter_values:
-            total += letter_values[c]
-
-    return reduce_number(total)
-
-
-def compatibility_score(player_number, event_number):
-
-    if event_number in compatibility.get(player_number, []):
-        return 2
-
-    if player_number == event_number:
-        return 3
-
-    if abs(player_number-event_number) == 1:
-        return 1
-
-    return 0
-
-
-def competition_pressure(round_name):
-
-    pressure = {
-
-        "Round of 128":"Presiune foarte mica",
-        "Round of 64":"Presiune mica",
-        "Round of 32":"Presiune moderata",
-        "Round of 16":"Presiune ridicata",
-        "Quarterfinal":"Presiune mare",
-        "Semifinal":"Presiune foarte mare",
-        "Final":"Presiune maxima"
-
-    }
-
-    return pressure.get(round_name,"Necunoscut")
-
-
-# -----------------------------
-# PAGINA ANALIZA TENIS
-# -----------------------------
-
-@app.route("/", methods=["GET","POST"])
-def index():
-
-    result = None
-
-    if request.method == "POST":
-
-        p1 = request.form["player1"]
-        b1 = request.form["birth1"]
-
-        p2 = request.form["player2"]
-        b2 = request.form["birth2"]
-
-        date = request.form["date"]
-        time = request.form["time"]
-        surface = request.form["surface"]
-        round_name = request.form["round"]
-        tournament = request.form["tournament"]
-
-        odds1 = request.form.get("odds1")
-        odds2 = request.form.get("odds2")
-
-        day = universal_day(date)
-        hour = hour_vibration(time)
-        surface_v = word_vibration(surface)
-        round_v = word_vibration(round_name)
-        location_v = word_vibration(tournament)
-
-        event_total = reduce_number(day + hour + surface_v + round_v + location_v)
-
-
-        def analyze(name,birth):
-
-            destiny = destiny_number(birth)
-            name_num = name_number(name)
-            personal = personal_day(birth,date)
-            year = personal_year(birth,date)
-
-            score = 0
-
-            score += compatibility_score(destiny,event_total)
-            score += compatibility_score(name_num,event_total)
-            score += compatibility_score(personal,event_total)
-
-            return {
-                "destiny":destiny,
-                "name":name_num,
-                "personal":personal,
-                "year":year,
-                "score":score
-            }
-
-
-        p1_data = analyze(p1,b1)
-        p2_data = analyze(p2,b2)
-
-
-        total_score = p1_data["score"] + p2_data["score"]
-
-
-        if total_score == 0:
-
-            prob1 = 50
-            prob2 = 50
-
-        else:
-
-            prob1 = round((p1_data["score"] / total_score) * 100)
-            prob2 = round((p2_data["score"] / total_score) * 100)
-
-
-        prediction = p1 if prob1 > prob2 else p2
-
-
-        book_prob1 = None
-        book_prob2 = None
-        value1 = None
-        value2 = None
-
-
-        if odds1 and odds2:
-
-            odds1 = float(odds1)
-            odds2 = float(odds2)
-
-            book_prob1 = round((1/odds1)*100,2)
-            book_prob2 = round((1/odds2)*100,2)
-
-            value1 = round(prob1 - book_prob1,2)
-            value2 = round(prob2 - book_prob2,2)
-
-
-        result = {
-
-            "player1":p1,
-            "player2":p2,
-
-            "day":day,
-            "hour":hour,
-            "surface":surface_v,
-            "round":round_v,
-            "location":location_v,
-            "event":event_total,
-            "pressure":competition_pressure(round_name),
-
-            "p1":p1_data,
-            "p2":p2_data,
-
-            "prob1":prob1,
-            "prob2":prob2,
-
-            "book_prob1":book_prob1,
-            "book_prob2":book_prob2,
-
-            "value1":value1,
-            "value2":value2,
-
-            "prediction":prediction
-
-        }
-
-
-    return render_template("index.html", result=result)
-
-
-
-# -----------------------------
-# PAGINA COMPATIBILITATE RELATIE
-# -----------------------------
 
 def soul_number(name):
 
-    vowels = "AEIOU"
-
-    total = 0
+    vowels="AEIOU"
+    total=0
 
     for c in name.upper():
-
         if c in vowels and c in letter_values:
-            total += letter_values[c]
+            total+=letter_values[c]
 
     return reduce_number(total)
 
 
 def personality_number(name):
 
-    vowels = "AEIOU"
-
-    total = 0
+    vowels="AEIOU"
+    total=0
 
     for c in name.upper():
-
         if c not in vowels and c in letter_values:
-            total += letter_values[c]
+            total+=letter_values[c]
 
     return reduce_number(total)
 
 
-def relation_compatibility(n1,n2):
+def couple_vibration(name1,name2):
 
-    if n1 == n2:
-        return 100
+    return reduce_number(name_number(name1)+name_number(name2))
 
-    diff = abs(n1-n2)
 
-    if diff == 1:
-        return 80
-    elif diff == 2:
-        return 60
-    elif diff == 3:
-        return 50
-    elif diff == 4:
-        return 40
-    else:
-        return 30
+def emotional_compatibility(s1,s2):
+
+    diff=abs(s1-s2)
+
+    return max(0,100-diff*12)
+
+
+def sexual_compatibility(p1,p2):
+
+    diff=abs(p1-p2)
+
+    return max(0,100-diff*10)
+
+
+def karmic_analysis(d1,d2,s1,s2):
+
+    if d1==d2 and s1==s2:
+        return "Relatie karmica foarte puternica"
+
+    if d1==d2:
+        return "Relatie karmica"
+
+    if abs(d1-d2)==1:
+        return "Relatie de lectie karmica"
+
+    return "Relatie normala"
+
+
+def marriage_probability(score,relation):
+
+    base=score
+
+    if relation in [2,6]:
+        base+=10
+
+    return min(100,base)
+
+
+def divorce_probability(score):
+
+    return max(0,100-score)
+
+
+def relationship_years(relation_date):
+
+    years=[]
+
+    if relation_date:
+
+        year=int(relation_date[:4])
+
+        current=datetime.datetime.now().year
+
+        for y in range(current,current+5):
+
+            vib=reduce_number(y+year)
+
+            years.append((y,vib))
+
+    return years
 
 
 @app.route("/relatie", methods=["GET","POST"])
 def relatie():
 
-    result = None
+    result=None
 
-    if request.method == "POST":
+    if request.method=="POST":
 
-        name1 = request.form["name1"]
-        birth1 = request.form["birth1"]
+        name1=request.form["name1"]
+        married1=request.form.get("married1","")
+        birth1=request.form["birth1"]
 
-        name2 = request.form["name2"]
-        birth2 = request.form["birth2"]
+        name2=request.form["name2"]
+        married2=request.form.get("married2","")
+        birth2=request.form["birth2"]
 
-
-        p1_destiny = destiny_number(birth1)
-        p1_name = name_number(name1)
-        p1_soul = soul_number(name1)
-        p1_personality = personality_number(name1)
-
-        p2_destiny = destiny_number(birth2)
-        p2_name = name_number(name2)
-        p2_soul = soul_number(name2)
-        p2_personality = personality_number(name2)
+        relation_date=request.form.get("relation_date","")
 
 
-        destiny_comp = relation_compatibility(p1_destiny,p2_destiny)
-        soul_comp = relation_compatibility(p1_soul,p2_soul)
-        name_comp = relation_compatibility(p1_name,p2_name)
+        destiny1=destiny_number(birth1)
+        destiny2=destiny_number(birth2)
 
-        total = round((destiny_comp + soul_comp + name_comp)/3)
+        name_num1=name_number(name1)
+        name_num2=name_number(name2)
+
+        soul1=soul_number(name1)
+        soul2=soul_number(name2)
+
+        pers1=personality_number(name1)
+        pers2=personality_number(name2)
 
 
-        relation_number = reduce_number(p1_destiny + p2_destiny)
+        relation_number=reduce_number(destiny1+destiny2)
+
+        couple_energy=couple_vibration(name1,name2)
 
 
-        result = {
+        emotional=emotional_compatibility(soul1,soul2)
 
-            "name1":name1,
-            "name2":name2,
+        sexual=sexual_compatibility(pers1,pers2)
 
-            "p1_destiny":p1_destiny,
-            "p1_name":p1_name,
-            "p1_soul":p1_soul,
-            "p1_personality":p1_personality,
+        score=round((emotional+sexual)/2)
 
-            "p2_destiny":p2_destiny,
-            "p2_name":p2_name,
-            "p2_soul":p2_soul,
-            "p2_personality":p2_personality,
 
-            "destiny_comp":destiny_comp,
-            "soul_comp":soul_comp,
-            "name_comp":name_comp,
+        karmic=karmic_analysis(destiny1,destiny2,soul1,soul2)
 
-            "total":total,
+        marriage=marriage_probability(score,relation_number)
 
-            "relation_number":relation_number
+        divorce=divorce_probability(score)
+
+        years=relationship_years(relation_date)
+
+
+        result={
+
+        "name1":name1,
+        "name2":name2,
+
+        "destiny1":destiny1,
+        "destiny2":destiny2,
+
+        "name_num1":name_num1,
+        "name_num2":name_num2,
+
+        "soul1":soul1,
+        "soul2":soul2,
+
+        "relation_number":relation_number,
+
+        "couple_energy":couple_energy,
+
+        "emotional":emotional,
+
+        "sexual":sexual,
+
+        "score":score,
+
+        "karmic":karmic,
+
+        "marriage":marriage,
+
+        "divorce":divorce,
+
+        "years":years
 
         }
 
-    return render_template("relatie.html", result=result)
+    return render_template("relatie.html",result=result)
 
 
-if __name__ == "__main__":
+if __name__=="__main__":
     app.run(debug=True)

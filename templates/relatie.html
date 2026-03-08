@@ -16,14 +16,11 @@
 
 <div class="container py-5">
 
-<h2 class="text-center mb-4">❤️ Compatibilitate Numerologica Relatie</h2>
+<h2 class="text-center mb-4">❤️ Analiza Numerologica Relatie</h2>
 
 <div class="text-center mb-4">
-
-<a href="/" class="btn btn-outline-primary">Analiza Tenis</a>
-
+<a href="/" class="btn btn-primary">Analiza Tenis</a>
 </div>
-
 
 <div class="card p-4">
 
@@ -36,10 +33,19 @@
 <h5>Persoana 1</h5>
 
 <label>Nume complet</label>
-<input class="form-control mb-3" name="name1" value="{{request.form.get('name1','')}}">
+<input class="form-control mb-2" name="name1">
+
+<label>Nume dupa casatorie (optional)</label>
+<input class="form-control mb-2" name="married1">
 
 <label>Data nasterii</label>
-<input type="date" class="form-control mb-3" name="birth1" value="{{request.form.get('birth1','')}}">
+<input type="date" class="form-control mb-2" name="birth1">
+
+<label>Ora nasterii (optional)</label>
+<input type="time" class="form-control mb-2" name="time1">
+
+<label>Locul nasterii (optional)</label>
+<input class="form-control mb-3" name="place1">
 
 </div>
 
@@ -49,14 +55,28 @@
 <h5>Persoana 2</h5>
 
 <label>Nume complet</label>
-<input class="form-control mb-3" name="name2" value="{{request.form.get('name2','')}}">
+<input class="form-control mb-2" name="name2">
+
+<label>Nume dupa casatorie (optional)</label>
+<input class="form-control mb-2" name="married2">
 
 <label>Data nasterii</label>
-<input type="date" class="form-control mb-3" name="birth2" value="{{request.form.get('birth2','')}}">
+<input type="date" class="form-control mb-2" name="birth2">
+
+<label>Ora nasterii (optional)</label>
+<input type="time" class="form-control mb-2" name="time2">
+
+<label>Locul nasterii (optional)</label>
+<input class="form-control mb-3" name="place2">
 
 </div>
 
 </div>
+
+<hr>
+
+<label>Data inceperii relatiei</label>
+<input type="date" class="form-control mb-3" name="relation_date">
 
 <div class="text-center">
 
@@ -77,23 +97,56 @@ Genereaza analiza relatie
 
 <div class="card mt-4 p-4">
 
-<h4>Compatibilitate</h4>
+<h4>Numere personale</h4>
 
-<p>Compatibilitate destin: <b>{{result.destiny_comp}}%</b></p>
+<p>{{result.name1}} - Numarul destinului: <b>{{result.destiny1}}</b></p>
+<p>{{result.name2}} - Numarul destinului: <b>{{result.destiny2}}</b></p>
 
-<p>Compatibilitate suflet: <b>{{result.soul_comp}}%</b></p>
+<p>Numarul numelui: {{result.name_num1}} / {{result.name_num2}}</p>
 
-<p>Compatibilitate nume: <b>{{result.name_comp}}%</b></p>
-
-<hr>
-
-<h4>Compatibilitate generala</h4>
-
-<h2>{{result.total}}%</h2>
+<p>Numarul sufletului: {{result.soul1}} / {{result.soul2}}</p>
 
 <hr>
+
+<h4>Analiza relatie</h4>
 
 <p>Numarul relatiei: <b>{{result.relation_number}}</b></p>
+
+<p>Vibratia cuplului: <b>{{result.couple_energy}}</b></p>
+
+<p>Compatibilitate emotionala: <b>{{result.emotional}}%</b></p>
+
+<p>Compatibilitate sexuala: <b>{{result.sexual}}%</b></p>
+
+<p>Scor compatibilitate: <b>{{result.score}}%</b></p>
+
+<hr>
+
+<h4>Analiza karmica</h4>
+
+<p>{{result.karmic}}</p>
+
+<hr>
+
+<h4>Probabilitati</h4>
+
+<p>Probabilitate casatorie: <b>{{result.marriage}}%</b></p>
+
+<p>Probabilitate divort: <b>{{result.divorce}}%</b></p>
+
+<hr>
+
+<h4>Analiza ani ai relatiei</h4>
+
+<ul>
+
+{% for y,v in result.years %}
+
+<li>{{y}} - Vibratia relatiei: {{v}}</li>
+
+{% endfor %}
+
+</ul>
 
 </div>
 
@@ -102,4 +155,5 @@ Genereaza analiza relatie
 </div>
 
 </body>
+
 </html>
