@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Compatibilitate Numerologica</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+
+<body style="background:#f4f6fb;">
+
+<div class="container py-5">
+
+<h2 class="text-center mb-4">❤️ Compatibilitate Numerologica Relatie</h2>
+
+<div class="text-center mb-4">
+
+<a href="/" class="btn btn-outline-primary">Analiza Tenis</a>
+
+</div>
+
+
+<div class="card p-4">
+
+<form method="post">
+
+<div class="row">
+
+<div class="col-md-6">
+
+<h5>Persoana 1</h5>
+
+<label>Nume complet</label>
+<input class="form-control mb-3" name="name1" value="{{request.form.get('name1','')}}">
+
+<label>Data nasterii</label>
+<input type="date" class="form-control mb-3" name="birth1" value="{{request.form.get('birth1','')}}">
+
+</div>
+
+
+<div class="col-md-6">
+
+<h5>Persoana 2</h5>
+
+<label>Nume complet</label>
+<input class="form-control mb-3" name="name2" value="{{request.form.get('name2','')}}">
+
+<label>Data nasterii</label>
+<input type="date" class="form-control mb-3" name="birth2" value="{{request.form.get('birth2','')}}">
+
+</div>
+
+</div>
+
+<div class="text-center">
+
+<button class="btn btn-danger btn-lg">
+
+Genereaza analiza relatie
+
+</button>
+
+</div>
+
+</form>
+
+</div>
+
+
+{% if result %}
+
+<div class="card mt-4 p-4">
+
+<h4>Compatibilitate</h4>
+
+<p>Compatibilitate destin: <b>{{result.destiny_comp}}%</b></p>
+
+<p>Compatibilitate suflet: <b>{{result.soul_comp}}%</b></p>
+
+<p>Compatibilitate nume: <b>{{result.name_comp}}%</b></p>
+
+<hr>
+
+<h4>Compatibilitate generala</h4>
+
+<h2>{{result.total}}%</h2>
+
+<hr>
+
+<p>Numarul relatiei: <b>{{result.relation_number}}</b></p>
+
+</div>
+
+{% endif %}
+
+</div>
+
+</body>
+</html>

@@ -31,66 +31,94 @@ compatibility = {
 
 
 def reduce_number(n):
+
     while n > 9 and n not in [11,22,33]:
         n = sum(int(d) for d in str(n))
+
     return n
 
 
 def name_number(name):
+
     total = 0
+
     for c in name.upper():
+
         if c in letter_values:
             total += letter_values[c]
+
     return reduce_number(total)
 
 
 def destiny_number(date):
+
     digits = [int(d) for d in re.sub(r'\D','',date)]
+
     return reduce_number(sum(digits))
 
 
 def universal_day(date):
+
     digits = [int(d) for d in re.sub(r'\D','',date)]
+
     return reduce_number(sum(digits))
 
 
 def personal_day(birth, match):
+
     b = sum(int(d) for d in re.sub(r'\D','',birth))
+
     m = sum(int(d) for d in re.sub(r'\D','',match))
+
     return reduce_number(b + m)
 
 
 def personal_year(birth, match):
+
     birth_digits = [int(d) for d in re.sub(r'\D','',birth)][4:]
+
     year_digits = [int(d) for d in match[:4]]
+
     return reduce_number(sum(birth_digits) + sum(year_digits))
 
 
 def hour_vibration(time):
+
     digits = [int(d) for d in re.sub(r'\D','',time)]
+
     return reduce_number(sum(digits))
 
 
 def word_vibration(word):
+
     total = 0
+
     for c in word.upper():
+
         if c in letter_values:
             total += letter_values[c]
+
     return reduce_number(total)
 
 
 def compatibility_score(player_number, event_number):
+
     if event_number in compatibility.get(player_number, []):
         return 2
+
     if player_number == event_number:
         return 3
+
     if abs(player_number-event_number) == 1:
         return 1
+
     return 0
 
 
 def competition_pressure(round_name):
+
     pressure = {
+
         "Round of 128":"Presiune foarte mica",
         "Round of 64":"Presiune mica",
         "Round of 32":"Presiune moderata",
@@ -98,9 +126,15 @@ def competition_pressure(round_name):
         "Quarterfinal":"Presiune mare",
         "Semifinal":"Presiune foarte mare",
         "Final":"Presiune maxima"
+
     }
+
     return pressure.get(round_name,"Necunoscut")
 
+
+# -----------------------------
+# PAGINA ANALIZA TENIS
+# -----------------------------
 
 @app.route("/", methods=["GET","POST"])
 def index():
@@ -132,6 +166,7 @@ def index():
 
         event_total = reduce_number(day + hour + surface_v + round_v + location_v)
 
+
         def analyze(name,birth):
 
             destiny = destiny_number(birth)
@@ -140,6 +175,7 @@ def index():
             year = personal_year(birth,date)
 
             score = 0
+
             score += compatibility_score(destiny,event_total)
             score += compatibility_score(name_num,event_total)
             score += compatibility_score(personal,event_total)
@@ -152,24 +188,33 @@ def index():
                 "score":score
             }
 
+
         p1_data = analyze(p1,b1)
         p2_data = analyze(p2,b2)
 
+
         total_score = p1_data["score"] + p2_data["score"]
 
+
         if total_score == 0:
+
             prob1 = 50
             prob2 = 50
+
         else:
+
             prob1 = round((p1_data["score"] / total_score) * 100)
             prob2 = round((p2_data["score"] / total_score) * 100)
 
+
         prediction = p1 if prob1 > prob2 else p2
+
 
         book_prob1 = None
         book_prob2 = None
         value1 = None
         value2 = None
+
 
         if odds1 and odds2:
 
@@ -182,9 +227,12 @@ def index():
             value1 = round(prob1 - book_prob1,2)
             value2 = round(prob2 - book_prob2,2)
 
+
         result = {
+
             "player1":p1,
             "player2":p2,
+
             "day":day,
             "hour":hour,
             "surface":surface_v,
@@ -192,18 +240,140 @@ def index():
             "location":location_v,
             "event":event_total,
             "pressure":competition_pressure(round_name),
+
             "p1":p1_data,
             "p2":p2_data,
+
             "prob1":prob1,
             "prob2":prob2,
+
             "book_prob1":book_prob1,
             "book_prob2":book_prob2,
+
             "value1":value1,
             "value2":value2,
+
             "prediction":prediction
+
         }
 
+
     return render_template("index.html", result=result)
+
+
+
+# -----------------------------
+# PAGINA COMPATIBILITATE RELATIE
+# -----------------------------
+
+def soul_number(name):
+
+    vowels = "AEIOU"
+
+    total = 0
+
+    for c in name.upper():
+
+        if c in vowels and c in letter_values:
+            total += letter_values[c]
+
+    return reduce_number(total)
+
+
+def personality_number(name):
+
+    vowels = "AEIOU"
+
+    total = 0
+
+    for c in name.upper():
+
+        if c not in vowels and c in letter_values:
+            total += letter_values[c]
+
+    return reduce_number(total)
+
+
+def relation_compatibility(n1,n2):
+
+    if n1 == n2:
+        return 100
+
+    diff = abs(n1-n2)
+
+    if diff == 1:
+        return 80
+    elif diff == 2:
+        return 60
+    elif diff == 3:
+        return 50
+    elif diff == 4:
+        return 40
+    else:
+        return 30
+
+
+@app.route("/relatie", methods=["GET","POST"])
+def relatie():
+
+    result = None
+
+    if request.method == "POST":
+
+        name1 = request.form["name1"]
+        birth1 = request.form["birth1"]
+
+        name2 = request.form["name2"]
+        birth2 = request.form["birth2"]
+
+
+        p1_destiny = destiny_number(birth1)
+        p1_name = name_number(name1)
+        p1_soul = soul_number(name1)
+        p1_personality = personality_number(name1)
+
+        p2_destiny = destiny_number(birth2)
+        p2_name = name_number(name2)
+        p2_soul = soul_number(name2)
+        p2_personality = personality_number(name2)
+
+
+        destiny_comp = relation_compatibility(p1_destiny,p2_destiny)
+        soul_comp = relation_compatibility(p1_soul,p2_soul)
+        name_comp = relation_compatibility(p1_name,p2_name)
+
+        total = round((destiny_comp + soul_comp + name_comp)/3)
+
+
+        relation_number = reduce_number(p1_destiny + p2_destiny)
+
+
+        result = {
+
+            "name1":name1,
+            "name2":name2,
+
+            "p1_destiny":p1_destiny,
+            "p1_name":p1_name,
+            "p1_soul":p1_soul,
+            "p1_personality":p1_personality,
+
+            "p2_destiny":p2_destiny,
+            "p2_name":p2_name,
+            "p2_soul":p2_soul,
+            "p2_personality":p2_personality,
+
+            "destiny_comp":destiny_comp,
+            "soul_comp":soul_comp,
+            "name_comp":name_comp,
+
+            "total":total,
+
+            "relation_number":relation_number
+
+        }
+
+    return render_template("relatie.html", result=result)
 
 
 if __name__ == "__main__":
