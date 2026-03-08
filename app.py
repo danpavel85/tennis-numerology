@@ -5,8 +5,6 @@ import os
 
 app = Flask(__name__)
 
-# ---------------- NUMEROLOGY CORE ----------------
-
 letter_values = {
 'A':1,'J':1,'S':1,
 'B':2,'K':2,'T':2,
@@ -20,48 +18,84 @@ letter_values = {
 }
 
 def reduce_number(n):
+
     while n > 9 and n not in [11,22,33]:
-        n = sum(int(d) for d in str(n))
+
+        n=sum(int(d) for d in str(n))
+
     return n
 
+
 def name_number(name):
-    total = 0
+
+    if not name:
+        return 0
+
+    total=0
+
     for c in name.upper():
+
         if c in letter_values:
-            total += letter_values[c]
+
+            total+=letter_values[c]
+
     return reduce_number(total)
+
 
 def destiny_number(date):
-    digits = [int(d) for d in re.sub(r'\D','',date)]
+
+    if not date:
+        return 0
+
+    digits=[int(d) for d in re.sub(r'\D','',date)]
+
     return reduce_number(sum(digits))
 
+
 def soul_number(name):
+
     vowels="AEIOU"
+
     total=0
+
     for c in name.upper():
+
         if c in vowels and c in letter_values:
+
             total+=letter_values[c]
+
     return reduce_number(total)
+
 
 def personality_number(name):
+
     vowels="AEIOU"
+
     total=0
+
     for c in name.upper():
+
         if c not in vowels and c in letter_values:
+
             total+=letter_values[c]
+
     return reduce_number(total)
 
+
 def compatibility(a,b):
+
     diff=abs(a-b)
+
     return max(0,100-diff*12)
 
-# ---------------- HOME ----------------
+# HOME
 
 @app.route("/")
 def home():
+
     return render_template("home.html")
 
-# ---------------- TENIS ----------------
+# TENIS
 
 @app.route("/tenis", methods=["GET","POST"])
 def tenis():
@@ -70,11 +104,11 @@ def tenis():
 
     if request.method=="POST":
 
-        p1=request.form.get("player1")
-        p2=request.form.get("player2")
+        p1=request.form.get("player1","")
+        p2=request.form.get("player2","")
 
-        b1=request.form.get("birth1")
-        b2=request.form.get("birth2")
+        b1=request.form.get("birth1","")
+        b2=request.form.get("birth2","")
 
         d1=destiny_number(b1)
         d2=destiny_number(b2)
@@ -88,25 +122,32 @@ def tenis():
         total=s1+s2
 
         if total==0:
+
             prob1=50
             prob2=50
+
         else:
+
             prob1=round(s1/total*100)
             prob2=round(s2/total*100)
 
         prediction=p1 if prob1>prob2 else p2
 
         result={
-            "player1":p1,
-            "player2":p2,
-            "prob1":prob1,
-            "prob2":prob2,
-            "prediction":prediction
+
+        "player1":p1,
+        "player2":p2,
+
+        "prob1":prob1,
+        "prob2":prob2,
+
+        "prediction":prediction
+
         }
 
     return render_template("index.html",result=result)
 
-# ---------------- RELATIE ----------------
+# RELATIE
 
 @app.route("/relatie", methods=["GET","POST"])
 def relatie():
@@ -115,11 +156,11 @@ def relatie():
 
     if request.method=="POST":
 
-        name1=request.form.get("name1")
-        name2=request.form.get("name2")
+        name1=request.form.get("name1","")
+        name2=request.form.get("name2","")
 
-        birth1=request.form.get("birth1")
-        birth2=request.form.get("birth2")
+        birth1=request.form.get("birth1","")
+        birth2=request.form.get("birth2","")
 
         d1=destiny_number(birth1)
         d2=destiny_number(birth2)
@@ -144,22 +185,29 @@ def relatie():
         score=round((emotional+sexual+mental+spiritual)/4)
 
         result={
-            "score":score,
-            "destiny1":d1,
-            "destiny2":d2,
-            "name_num1":n1,
-            "name_num2":n2,
-            "soul1":soul1,
-            "soul2":soul2,
-            "pers1":pers1,
-            "pers2":pers2,
-            "relation_number":relation,
-            "couple_energy":couple
+
+        "score":score,
+
+        "destiny1":d1,
+        "destiny2":d2,
+
+        "name_num1":n1,
+        "name_num2":n2,
+
+        "soul1":soul1,
+        "soul2":soul2,
+
+        "pers1":pers1,
+        "pers2":pers2,
+
+        "relation_number":relation,
+        "couple_energy":couple
+
         }
 
     return render_template("relatie.html",result=result)
 
-# ---------------- PROFIL NUMEROLOGIC AVANSAT ----------------
+# PROFIL
 
 @app.route("/profil", methods=["GET","POST"])
 def profil():
@@ -168,8 +216,8 @@ def profil():
 
     if request.method=="POST":
 
-        name=request.form.get("name")
-        birth=request.form.get("birth")
+        name=request.form.get("name","")
+        birth=request.form.get("birth","")
 
         destiny=destiny_number(birth)
         expression=name_number(name)
@@ -178,38 +226,21 @@ def profil():
 
         maturity=reduce_number(destiny+expression)
 
-        digits=[int(d) for d in re.sub(r'\D','',birth)]
+        digits=[int(d) for d in re.sub(r'\D','',birth)] if birth else [0,0,0]
 
-        life_cycle1=reduce_number(digits[1])
-        life_cycle2=reduce_number(digits[2])
-        life_cycle3=reduce_number(digits[0])
-
-        challenge1=abs(life_cycle1-life_cycle2)
-        challenge2=abs(life_cycle2-life_cycle3)
-        challenge3=abs(life_cycle1-life_cycle3)
+        life_cycle1=reduce_number(digits[0])
+        life_cycle2=reduce_number(digits[1])
+        life_cycle3=reduce_number(digits[2])
 
         year=datetime.datetime.now().year
 
         personal_year=reduce_number(destiny+year)
-        personal_month=reduce_number(personal_year+datetime.datetime.now().month)
-        personal_day=reduce_number(personal_month+datetime.datetime.now().day)
 
-        forecast_years=[]
+        forecast=[]
 
         for i in range(1,10):
 
-            forecast_years.append((year+i,reduce_number(personal_year+i)))
-
-        forecast_months=[]
-
-        for m in range(1,13):
-
-            forecast_months.append((m,reduce_number(personal_year+m)))
-
-        karmic=[]
-
-        if destiny in [13,14,16,19]:
-            karmic.append(destiny)
+            forecast.append((year+i,reduce_number(personal_year+i)))
 
         result={
 
@@ -223,23 +254,14 @@ def profil():
         "life_cycle2":life_cycle2,
         "life_cycle3":life_cycle3,
 
-        "challenge1":challenge1,
-        "challenge2":challenge2,
-        "challenge3":challenge3,
-
         "personal_year":personal_year,
-        "personal_month":personal_month,
-        "personal_day":personal_day,
+        "forecast":forecast
 
-        "forecast_years":forecast_years,
-        "forecast_months":forecast_months,
-
-        "karmic":karmic
         }
 
     return render_template("profil.html",result=result)
 
-# ---------------- SERVER ----------------
+# SERVER
 
 if __name__=="__main__":
 
